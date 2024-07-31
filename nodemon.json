@@ -1,0 +1,7 @@
+{
+    "watch": ["cmd", "internal", "pkg"],
+    "ext": "go",
+    "exec": "make swag && make dev",
+    "signal": "SIGTERM"
+  }
+  

@@ -1,0 +1,49 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Advent Calendar API docs",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "172.23.116.163:9000",
+    "basePath": "/",
+    "paths": {
+        "/api/day": {
+            "post": {
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/repository.DayDTO"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "repository.DayDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+basePath: /
+definitions:
+  repository.DayDTO:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+host: 172.23.116.163:9000
+info:
+  contact: {}
+  title: Advent Calendar API docs
+  version: "1.0"
+paths:
+  /api/day:
+    post:
+      parameters:
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: title
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/repository.DayDTO'
+swagger: "2.0"
