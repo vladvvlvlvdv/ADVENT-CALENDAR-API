@@ -1,11 +1,53 @@
 basePath: /
 definitions:
-  repository.DayDTO:
+  handler.Tokens:
     properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  repository.Attachment:
+    properties:
+      id:
+        type: integer
+      label:
+        type: string
+      type:
+        type: string
+      url:
+        type: string
+    type: object
+  repository.Day:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/repository.Attachment'
+        type: array
       description:
         type: string
+      id:
+        type: integer
       title:
         type: string
+    type: object
+  repository.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      refreshToken:
+        type: string
+      role:
+        type: string
+    type: object
+  validators.GlobalErrorHandlerResp:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
     type: object
 host: 172.23.116.163:9000
 info:
@@ -13,18 +55,97 @@ info:
   title: Advent Calendar API docs
   version: "1.0"
 paths:
-  /api/day:
+  /api/days:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Day'
+            type: array
+      tags:
+      - Days
     post:
       parameters:
-      - in: formData
-        name: description
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
         type: string
       - in: formData
+        minLength: 5
+        name: description
+        required: true
+        type: string
+      - in: formData
+        minLength: 5
         name: title
+        required: true
+        type: string
+      - collectionFormat: csv
+        description: ' '
+        in: formData
+        items:
+          type: file
+        name: attachments
+        type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+      tags:
+      - Days
+  /api/users/check:
+    get:
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
         type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/repository.DayDTO'
+            $ref: '#/definitions/repository.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+      tags:
+      - Users
+  /api/users/login:
+    post:
+      parameters:
+      - in: formData
+        minLength: 5
+        name: email
+        required: true
+        type: string
+      - in: formData
+        minLength: 5
+        name: password
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Tokens'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+      tags:
+      - Users
 swagger: "2.0"

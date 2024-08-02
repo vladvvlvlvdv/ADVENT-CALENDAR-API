@@ -30,8 +30,10 @@ func (a *App) Run() {
 
 	a.Server.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-		AllowHeaders: "*",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
+
+	a.Server.Static("/api/public", "./public")
 
 	if config.Config.MODE == "dev" {
 		a.Server.Get("/swagger/*", swagger.HandlerDefault)

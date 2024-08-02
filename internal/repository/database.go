@@ -2,19 +2,23 @@ package repository
 
 import (
 	"advent-calendar/internal/config"
+	"advent-calendar/pkg/utils"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-type Model struct {
-	ID        uint      `gorm:"primarykey" json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
+type (
+	Params struct {
+		Limit int
+		Page  int
+	}
+)
 
 var DB *gorm.DB
 
@@ -29,7 +33,16 @@ func LoadDatabase() {
 		config.Config.DB_NAME,
 	)
 
-	DB, err = gorm.Open(mysql.Open(dsn))
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			Colorful:      true,
+		},
+	)
+
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
 	if err != nil {
 		log.Fatal("Ошибка подключения к базе данных")
 	}
@@ -40,6 +53,7 @@ func AutoMigrate() {
 		&Day{},
 		&Attachment{},
 		&Setting{},
+		&User{},
 	); err != nil {
 		log.Fatal("Ошибка миграции таблиц")
 	}
@@ -48,5 +62,14 @@ func AutoMigrate() {
 func RenderDatabase() {
 	DB.Where("id = 1").FirstOrCreate(&Setting{
 		Month: 12,
+	})
+
+	adminPass, _ := utils.HashPassword(config.Config.ADMIN_PASSWORD)
+	adminRefresh, _ := utils.NewRefreshToken()
+
+	DB.Where(&User{Email: config.Config.ADMIN_EMAIL, Role: "admin"}).FirstOrCreate(&User{
+		Email:        config.Config.ADMIN_EMAIL,
+		Password:     adminPass,
+		RefreshToken: adminRefresh,
 	})
 }

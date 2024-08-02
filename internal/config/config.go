@@ -1,6 +1,7 @@
 package config
 
 import (
+	"advent-calendar/pkg/validators"
 	"log"
 	"os"
 	"reflect"
@@ -9,16 +10,30 @@ import (
 )
 
 type ConfigStruct struct {
-	PORT        string
+	PORT   string
+	SECRET string
+	MODE   string
+
 	DB_HOST     string
 	DB_PORT     string
 	DB_USER     string
 	DB_PASSWORD string
 	DB_NAME     string
-	MODE        string
+
+	ADMIN_EMAIL    string
+	ADMIN_PASSWORD string
 }
 
-var Config ConfigStruct
+var (
+	Config      ConfigStruct
+	directories = [2]string{
+		"public",
+		"public/attachments",
+	}
+	Validator = &validators.XValidator{
+		Validator: validators.Validate,
+	}
+)
 
 func LoadConfig() {
 	if err := godotenv.Load(); err != nil {
@@ -26,6 +41,7 @@ func LoadConfig() {
 	}
 
 	setConfigFields(&Config)
+	createPublicDirectories()
 }
 
 func setConfigFields(config *ConfigStruct) {
@@ -36,23 +52,21 @@ func setConfigFields(config *ConfigStruct) {
 		field := t.Field(i)
 		fieldValue := v.Field(i)
 
-		switch fieldValue.Kind() {
-		case reflect.Struct:
-			setNestedStructFields(fieldValue)
-		default:
-			envVar := field.Name
-			fieldValue.SetString(os.Getenv(envVar))
+		envVar := field.Name
+		envValue := os.Getenv(envVar)
+
+		if envValue == "" {
+			log.Fatalf("Ошибка при установке пустого значения %s:", envVar)
 		}
+
+		fieldValue.SetString(envValue)
 	}
 }
 
-func setNestedStructFields(v reflect.Value) {
-	t := v.Type()
-
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		envVar := t.Name() + "_" + field.Name
-		fieldValue := v.Field(i)
-		fieldValue.SetString(os.Getenv(envVar))
+func createPublicDirectories() {
+	for _, dir := range directories {
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+			log.Fatal("Ошибка создания директории")
+		}
 	}
 }

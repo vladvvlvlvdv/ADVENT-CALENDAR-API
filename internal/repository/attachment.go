@@ -2,10 +2,10 @@ package repository
 
 type (
 	Attachment struct {
-		Model
+		ID    uint   `json:"id"`
 		Label string `json:"label"`
 		URL   string `json:"url"`
 		Type  string `json:"type"`
-		DayID uint
+		DayID uint   `json:"-"`
 	}
 )
