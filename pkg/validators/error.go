@@ -13,6 +13,7 @@ type (
 		Error       bool
 		FailedField string
 		Tag         string
+		Param       interface{}
 		Value       interface{}
 	}
 
@@ -40,6 +41,7 @@ func (v XValidator) Validate(data interface{}) []ErrorResponse {
 			elem.Tag = err.Tag()
 			elem.Value = err.Value()
 			elem.Error = true
+			elem.Param = err.Param()
 
 			validationErrors = append(validationErrors, elem)
 		}

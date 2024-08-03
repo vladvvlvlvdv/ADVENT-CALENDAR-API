@@ -67,29 +67,35 @@ func (h *Handler) Check(c *fiber.Ctx) error {
 }
 
 // @Tags Users
-// @Param Authorization header string true "Authorization"
+// @Param RefreshToken header string true "RefreshToken"
+// @Failure 500 {object} validators.GlobalErrorHandlerResp
 // @Failure 401 {object} validators.GlobalErrorHandlerResp
-// @Success 200 {object} repository.User
-// @Router /api/users/check [get]
-// func (h *Handler) Refresh(c *fiber.Ctx) error {
-// 	refreshToken := c.Get("refreshToken")
+// @Success 200 {object} Tokens
+// @Router /api/users/refresh [patch]
+func (h *Handler) Refresh(c *fiber.Ctx) error {
+	refreshToken := c.Get("RefreshToken")
 
-// 	user, err := repository.UserService.Get(repository.User{RefreshToken: refreshToken})
-// 	if err != nil {
-// 		return fiber.NewError(401, "Неправильный токен")
-// 	}
+	user, err := repository.UserService.Get(repository.User{RefreshToken: refreshToken})
+	if err != nil {
+		return fiber.NewError(401, "Неправильный токен")
+	}
 
-// 	jwt, err := utils.NewJWT(user.ID, user.Role)
-// 	if err!= nil {
-//         return fiber.NewError(500, err.Error())
-//     }
+	jwt, err := utils.NewJWT(user.ID, user.Role)
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
 
-// 	newToken, err := utils.NewRefreshToken()
-// 	if err!= nil {
-//         return fiber.NewError(500, err.Error())
-//     }
+	newToken, err := utils.NewRefreshToken()
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
 
-// 	err = repository.UserService.
+	err = user.Update(repository.User{RefreshToken: newToken})
+	if err != nil {
+		return fiber.NewError(500, "Ошибка при обновлении токена")
+	}
 
-// 	return c.JSON(user)
-// }
+	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken}
+
+	return c.JSON(tokens)
+}

@@ -11,7 +11,7 @@ type (
 		ID          uint         `json:"id"`
 		Title       string       `json:"title"`
 		Description string       `json:"description"`
-		Attachments []Attachment `json:"attachments"`
+		Attachments []Attachment `json:"attachments,omitempty"`
 	}
 
 	DayDTO struct {

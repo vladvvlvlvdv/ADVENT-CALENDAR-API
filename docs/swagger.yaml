@@ -105,6 +105,45 @@ paths:
             $ref: '#/definitions/validators.GlobalErrorHandlerResp'
       tags:
       - Days
+  /api/settings:
+    put:
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - in: formData
+        maximum: 12
+        minimum: 1
+        name: month
+        required: true
+        type: integer
+      - in: formData
+        name: showAllDays
+        type: boolean
+      - collectionFormat: csv
+        description: ' '
+        in: formData
+        items:
+          type: file
+        name: attachments
+        type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+      tags:
+      - Days
   /api/users/check:
     get:
       parameters:
@@ -144,6 +183,29 @@ paths:
             $ref: '#/definitions/handler.Tokens'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+      tags:
+      - Users
+  /api/users/refresh:
+    patch:
+      parameters:
+      - description: RefreshToken
+        in: header
+        name: RefreshToken
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Tokens'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/validators.GlobalErrorHandlerResp'
       tags:

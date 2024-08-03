@@ -5,7 +5,6 @@ import (
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
 	"advent-calendar/pkg/validators"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -65,7 +64,7 @@ func (h *Handler) GetAll(c *fiber.Ctx) error {
 		return fiber.NewError(500, "Ошибка при получении настроек")
 	}
 
-	daysCount := utils.DaysInMonth(time.Now().Year(), time.Month(setting.Month))
+	daysCount := utils.GetDaysCount(setting.Month, setting.ShowAllDays)
 
 	days, err := repository.DayService.GetAll(repository.Params{}, repository.Day{ID: uint(daysCount)})
 

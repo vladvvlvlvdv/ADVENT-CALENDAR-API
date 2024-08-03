@@ -2,7 +2,7 @@ package repository
 
 type (
 	LoginDTO struct {
-		Email    string `json:"email" form:"email" validate:"required,min=5"`
+		Email    string `json:"email" form:"email" validate:"required,min=5,email"`
 		Password string `json:"password" form:"password" validate:"required,min=5"`
 	}
 
@@ -23,6 +23,6 @@ func (u User) Get(where User) (User, error) {
 	return user, err
 }
 
-func (u User) Update(where User, toUpdate User) error {
-	return DB.Model(&u).Where(where).Updates(&toUpdate).Error
+func (u User) Update(toUpdate User) error {
+	return DB.Model(&u).Where(u).Updates(&toUpdate).Error
 }
