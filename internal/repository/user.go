@@ -6,12 +6,18 @@ type (
 		Password string `json:"password" form:"password" validate:"required,min=5"`
 	}
 
+	ConfirmUser struct {
+		Code  string `json:"code" form:"code" validate:"required,len=6"`
+		Email string `json:"email" form:"email" validate:"required,min=5,email"`
+	}
+
 	User struct {
 		ID           uint   `json:"id"`
 		Email        string `json:"email" gorm:"unique;not null"`
 		Password     string `json:"-" gorm:"not null;type:varchar(255)"`
 		Role         string `json:"role" gorm:"not null; default:user"`
 		RefreshToken string `json:"refreshToken" gorm:"not null"`
+		Code         string `json:"code"`
 	}
 )
 

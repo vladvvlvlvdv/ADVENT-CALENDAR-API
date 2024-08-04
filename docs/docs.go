@@ -307,6 +307,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/confirm": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "code",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 5,
+                        "type": "string",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Tokens"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/login": {
             "post": {
                 "tags": [
@@ -388,9 +430,9 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "RefreshToken",
-                        "name": "RefreshToken",
-                        "in": "header",
+                        "description": "Email",
+                        "name": "Email",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -398,7 +440,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Tokens"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "401": {
@@ -489,6 +531,9 @@ const docTemplate = `{
         "repository.User": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },

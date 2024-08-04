@@ -5,6 +5,7 @@ import (
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
 	"advent-calendar/pkg/validators"
+	"fmt"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
@@ -102,10 +103,10 @@ func Refresh(c *fiber.Ctx) error {
 }
 
 // @Tags Users
-// @Param RefreshToken header string true "RefreshToken"
+// @Param Email formData string true "Email"
 // @Failure 500 {object} validators.GlobalHandlerResp
 // @Failure 401 {object} validators.GlobalHandlerResp
-// @Success 200 {object} Tokens
+// @Success 200 {object} validators.GlobalHandlerResp
 // @Router /api/users/register [post]
 func Register(c *fiber.Ctx) error {
 	email := c.FormValue("email")
@@ -114,5 +115,54 @@ func Register(c *fiber.Ctx) error {
 		return fiber.NewError(400, "Некорректный Email")
 	}
 
-	return nil
+	code := utils.GenerateCode()
+
+	if _, err := repository.UserService.Create(repository.User{Email: email, Code: code}); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	if err := utils.SendMail(email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
+		return fiber.NewError(500, "Ошибка при отправке письма")
+	}
+
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Проверьте Ваш email, для продолжения регистрации"})
+}
+
+// @Tags Users
+// @Param request formData repository.ConfirmUser true "-"
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Failure 401 {object} validators.GlobalHandlerResp
+// @Success 200 {object} Tokens
+// @Router /api/users/confirm [patch]
+func ConfirmRegister(c *fiber.Ctx) error {
+	data := new(repository.ConfirmUser)
+
+	if err := c.BodyParser(data); err != nil {
+		return fiber.NewError(400, err.Error())
+	}
+
+	if errs := config.Validator.Validate(data); len(errs) > 0 && errs[0].Error {
+		return validators.ValidateError(errs)
+	}
+
+	user, err := repository.UserService.Get(repository.User{Code: data.Code, Email: data.Email})
+	if err != nil {
+		return fiber.NewError(401, "Неправильный код")
+	}
+
+	refreshToken, err := utils.NewRefreshToken()
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	if err := user.Update(repository.User{Code: "", RefreshToken: refreshToken}); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	jwt, exp, err := utils.NewJWT(user.ID, user.Role)
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	return c.JSON(Tokens{AccessToken: jwt, RefreshToken: refreshToken, Exp: exp})
 }

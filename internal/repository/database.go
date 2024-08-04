@@ -5,12 +5,9 @@ import (
 	"advent-calendar/pkg/utils"
 	"fmt"
 	"log"
-	"os"
-	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type (
@@ -33,16 +30,16 @@ func LoadDatabase() {
 		config.Config.DB_NAME,
 	)
 
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold: time.Second,
-			LogLevel:      logger.Info,
-			Colorful:      true,
-		},
-	)
+	// newLogger := logger.New(
+	// 	log.New(os.Stdout, "\r\n", log.LstdFlags),
+	// 	logger.Config{
+	// 		SlowThreshold: time.Second,
+	// 		LogLevel:      logger.Info,
+	// 		Colorful:      true,
+	// 	},
+	// )
 
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: newLogger})
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{ /*Logger: newLogger*/ })
 	if err != nil {
 		log.Fatal("Ошибка подключения к базе данных")
 	}
@@ -72,6 +69,8 @@ func RenderDatabase() {
 		Password:     adminPass,
 		RefreshToken: adminRefresh,
 	})
+
+	AddDefaultDays()
 }
 
 func AddDefaultDays() {
@@ -139,5 +138,7 @@ func AddDefaultDays() {
 		{ID: 31, Title: "Изучите признаки неблагонадежных сайтов", Description: "Неблагонадежные сайты содержат следующие признаки:\n Отсутствуют сведения об адресе, информации о юридическом лице, отсутствует номер телефона\n Адрес сайта похож на адреса известных сайтов, расположены вне доменной зоны ru, su, рф\n Предложения через чур хорошие, чтобы быть правдой\n В адресном поле отсутствует замочек и протокол https. Браузер уведомляет о просроченном сертификате\n Сайт содержит грамматические ошибки, мало страниц, нелогичная структура", IsLongRead: false},
 	}
 
-	log.Println(days)
+	for _, day := range days {
+		DB.Where("title = ?", day.Title).FirstOrCreate(&day)
+	}
 }

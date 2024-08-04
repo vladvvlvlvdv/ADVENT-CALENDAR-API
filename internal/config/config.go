@@ -22,6 +22,11 @@ type ConfigStruct struct {
 
 	ADMIN_EMAIL    string
 	ADMIN_PASSWORD string
+
+	SMTP_HOST     string
+	SMTP_PORT     string
+	SMTP_USER     string
+	SMTP_PASSWORD string
 }
 
 var (
