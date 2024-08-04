@@ -1,5 +1,10 @@
 package repository
 
+import (
+	"errors"
+	"strings"
+)
+
 type (
 	LoginDTO struct {
 		Email    string `json:"email" form:"email" validate:"required,min=5,email"`
@@ -34,6 +39,12 @@ func (u User) Update(toUpdate User) error {
 }
 
 func (u User) Create(newUser User) (User, error) {
-	err := DB.Create(&newUser).Error
-	return newUser, err
+	if err := DB.Create(&newUser).Error; err != nil {
+		if strings.Contains(err.Error(), "Error 1062") {
+			if strings.Contains(err.Error(), "users.uni_users_email") {
+				return User{}, errors.New("Такая почта уже используется")
+			}
+		}
+	}
+	return newUser, nil
 }

@@ -10,6 +10,10 @@ type (
 		Month       int  `json:"month" gorm:"not null"`
 		ShowAllDays bool `json:"showAllDays" gorm:"type:boolean;not null;default:false"`
 	}
+
+	Clicks struct {
+		IP string `json:"ip" gorm:"primaryKey;not null;unique"`
+	}
 )
 
 var SettingService = new(Setting)
