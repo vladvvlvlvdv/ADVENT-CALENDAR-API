@@ -55,7 +55,7 @@ func setConfigFields(config *ConfigStruct) {
 		envVar := field.Name
 		envValue := os.Getenv(envVar)
 
-		if envValue == "" {
+		if envValue == "" && envVar != "DB_PASSWORD" {
 			log.Fatalf("Ошибка при установке пустого значения %s:", envVar)
 		}
 

@@ -17,19 +17,21 @@ type Claims struct {
 	Role string `json:"role"`
 }
 
-func NewJWT(id uint, role string) (string, error) {
+func NewJWT(id uint, role string) (string, int64, error) {
+	exp := time.Now().Add(time.Minute * 1).Unix()
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":   id,
 		"role": role,
-		"exp":  time.Now().Add(time.Minute * 15).Unix(),
+		"exp":  exp,
 	})
 
 	tokenString, err := token.SignedString([]byte(config.Config.SECRET))
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return tokenString, nil
+	return tokenString, exp, nil
 }
 
 func NewRefreshToken() (string, error) {
@@ -59,7 +61,7 @@ func VerifyToken(token string) (Claims, error) {
 	return Claims{ID: uint(claims["id"].(float64)), Role: claims["role"].(string)}, nil
 }
 
-func GetBearerToken(c *fiber.Ctx, field string) (string, error) {
+func CheckBearerToken(c *fiber.Ctx, field string) (string, error) {
 	authHeader := c.Get(field)
 
 	if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {

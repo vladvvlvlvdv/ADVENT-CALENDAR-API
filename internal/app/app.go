@@ -30,7 +30,7 @@ func (a *App) Run() {
 
 	a.Server.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, RefreshToken",
 	}))
 
 	a.Server.Static("/api/public", "./public")

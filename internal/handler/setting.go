@@ -1,17 +1,35 @@
 package handler
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"advent-calendar/internal/config"
+	"advent-calendar/internal/repository"
+	"advent-calendar/pkg/validators"
 
-var SettingHandler = new(Handler)
+	"github.com/gofiber/fiber/v2"
+)
 
-// @Tags Days
+// @Tags Settings
 // @Param Authorization header string true "Authorization"
 // @Param request formData repository.SettingDTO true "-"
-// @Param attachments formData []file false " "
-// @Success 200 {object} validators.GlobalErrorHandlerResp
-// @Failure 400 {object} validators.GlobalErrorHandlerResp
-// @Failure 500 {object} validators.GlobalErrorHandlerResp
+// @Success 200 {object} validators.GlobalHandlerResp
+// @Failure 400 {object} validators.GlobalHandlerResp
+// @Failure 500 {object} validators.GlobalHandlerResp
 // @Router /api/settings [put]
-func (h *Handler) Update(c *fiber.Ctx) error {
-	return nil
+func UpdateSettings(c *fiber.Ctx) error {
+	data := new(repository.SettingDTO)
+
+	if err := c.BodyParser(data); err != nil {
+		return fiber.NewError(400, err.Error())
+	}
+
+	if errs := config.Validator.Validate(data); len(errs) > 0 && errs[0].Error {
+		return validators.ValidateError(errs)
+	}
+
+	if err := repository.SettingService.Update(repository.Setting{Month: data.Month, ShowAllDays: data.ShowAllDays}); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Настройки обновлены"})
+
 }

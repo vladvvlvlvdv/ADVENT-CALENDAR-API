@@ -4,6 +4,8 @@ definitions:
     properties:
       accessToken:
         type: string
+      exp:
+        type: integer
       refreshToken:
         type: string
     type: object
@@ -42,7 +44,7 @@ definitions:
       role:
         type: string
     type: object
-  validators.GlobalErrorHandlerResp:
+  validators.GlobalHandlerResp:
     properties:
       message:
         type: string
@@ -57,6 +59,11 @@ info:
 paths:
   /api/days:
     get:
+      parameters:
+      - description: Например Europe/Samara
+        in: query
+        name: timeZone
+        type: string
       responses:
         "200":
           description: OK
@@ -94,15 +101,81 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+      tags:
+      - Days
+  /api/days/{id}:
+    put:
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ' '
+        in: path
+        name: id
+        required: true
+        type: integer
+      - collectionFormat: csv
+        in: formData
+        items:
+          type: integer
+        name: attachmentIds
+        type: array
+      - in: formData
+        minLength: 5
+        name: description
+        type: string
+      - in: formData
+        minLength: 5
+        name: title
+        type: string
+      - collectionFormat: csv
+        description: ' '
+        in: formData
+        items:
+          type: file
+        name: attachments
+        type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+      tags:
+      - Days
+  /api/days/admin:
+    get:
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repository.Day'
+            type: array
       tags:
       - Days
   /api/settings:
@@ -122,28 +195,21 @@ paths:
       - in: formData
         name: showAllDays
         type: boolean
-      - collectionFormat: csv
-        description: ' '
-        in: formData
-        items:
-          type: file
-        name: attachments
-        type: array
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
       tags:
-      - Days
+      - Settings
   /api/users/check:
     get:
       parameters:
@@ -160,7 +226,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
       tags:
       - Users
   /api/users/login:
@@ -184,7 +250,7 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
       tags:
       - Users
   /api/users/refresh:
@@ -203,11 +269,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/validators.GlobalErrorHandlerResp'
+            $ref: '#/definitions/validators.GlobalHandlerResp'
       tags:
       - Users
 swagger: "2.0"

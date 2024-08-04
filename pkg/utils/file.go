@@ -47,9 +47,6 @@ func UploadFiles(uploads []Upload) func(c *fiber.Ctx) error {
 
 			if upl.FileType != "" {
 				for _, file := range files {
-					if upl.FileType == "" {
-						continue
-					}
 					err := validators.CheckFileExtension(upl.FileType, file)
 					if err != nil {
 						return fiber.NewError(400, err.Error())

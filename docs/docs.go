@@ -20,6 +20,14 @@ const docTemplate = `{
                 "tags": [
                     "Days"
                 ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Например Europe/Samara",
+                        "name": "timeZone",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -73,19 +81,120 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/days/admin": {
+            "get": {
+                "tags": [
+                    "Days"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repository.Day"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/days/{id}": {
+            "put": {
+                "tags": [
+                    "Days"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": " ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "attachmentIds",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 5,
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "minLength": 5,
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "csv",
+                        "description": " ",
+                        "name": "attachments",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     }
                 }
@@ -94,7 +203,7 @@ const docTemplate = `{
         "/api/settings": {
             "put": {
                 "tags": [
-                    "Days"
+                    "Settings"
                 ],
                 "parameters": [
                     {
@@ -116,35 +225,25 @@ const docTemplate = `{
                         "type": "boolean",
                         "name": "showAllDays",
                         "in": "formData"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "type": "file"
-                        },
-                        "collectionFormat": "csv",
-                        "description": " ",
-                        "name": "attachments",
-                        "in": "formData"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     }
                 }
@@ -174,7 +273,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     }
                 }
@@ -211,7 +310,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     }
                 }
@@ -241,13 +340,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/validators.GlobalErrorHandlerResp"
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     }
                 }
@@ -260,6 +359,9 @@ const docTemplate = `{
             "properties": {
                 "accessToken": {
                     "type": "string"
+                },
+                "exp": {
+                    "type": "integer"
                 },
                 "refreshToken": {
                     "type": "string"
@@ -320,7 +422,7 @@ const docTemplate = `{
                 }
             }
         },
-        "validators.GlobalErrorHandlerResp": {
+        "validators.GlobalHandlerResp": {
             "type": "object",
             "properties": {
                 "message": {

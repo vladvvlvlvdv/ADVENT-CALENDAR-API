@@ -14,7 +14,6 @@ var FilesExtensions = map[string][]string{
 }
 
 func CheckFileExtension(checkType string, file *multipart.FileHeader) error {
-
 	extFile := strings.ToLower(filepath.Ext(file.Filename))
 
 	for _, ext := range FilesExtensions[checkType] {

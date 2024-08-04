@@ -4,23 +4,23 @@ import (
 	"advent-calendar/internal/config"
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
+	"advent-calendar/pkg/validators"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var UserHandler = new(Handler)
-
 type Tokens struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+	Exp          int64  `json:"exp"`
 }
 
 // @Tags Users
 // @Param request formData repository.LoginDTO true "-"
-// @Failure 401 {object} validators.GlobalErrorHandlerResp
+// @Failure 401 {object} validators.GlobalHandlerResp
 // @Success 200 {object} Tokens
 // @Router /api/users/login [post]
-func (h *Handler) Login(c *fiber.Ctx) error {
+func Login(c *fiber.Ctx) error {
 	data := new(repository.LoginDTO)
 
 	if err := c.BodyParser(data); err != nil {
@@ -28,7 +28,7 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	}
 
 	if errs := config.Validator.Validate(data); len(errs) > 0 && errs[0].Error {
-		return h.validateError(errs)
+		return validators.ValidateError(errs)
 	}
 
 	user, err := repository.UserService.Get(repository.User{Email: data.Email})
@@ -40,22 +40,22 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 		return fiber.NewError(401, "Неправильный пароль")
 	}
 
-	jwt, err := utils.NewJWT(user.ID, user.Role)
+	jwt, exp, err := utils.NewJWT(user.ID, user.Role)
 	if err != nil {
 		return fiber.NewError(500, err.Error())
 	}
 
-	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken}
+	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
 
 	return c.JSON(tokens)
 }
 
 // @Tags Users
 // @Param Authorization header string true "Authorization"
-// @Failure 401 {object} validators.GlobalErrorHandlerResp
+// @Failure 401 {object} validators.GlobalHandlerResp
 // @Success 200 {object} repository.User
 // @Router /api/users/check [get]
-func (h *Handler) Check(c *fiber.Ctx) error {
+func Check(c *fiber.Ctx) error {
 	userClaims := c.Locals("user").(utils.Claims)
 
 	user, err := repository.UserService.Get(repository.User{ID: userClaims.ID})
@@ -68,11 +68,11 @@ func (h *Handler) Check(c *fiber.Ctx) error {
 
 // @Tags Users
 // @Param RefreshToken header string true "RefreshToken"
-// @Failure 500 {object} validators.GlobalErrorHandlerResp
-// @Failure 401 {object} validators.GlobalErrorHandlerResp
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Failure 401 {object} validators.GlobalHandlerResp
 // @Success 200 {object} Tokens
 // @Router /api/users/refresh [patch]
-func (h *Handler) Refresh(c *fiber.Ctx) error {
+func Refresh(c *fiber.Ctx) error {
 	refreshToken := c.Get("RefreshToken")
 
 	user, err := repository.UserService.Get(repository.User{RefreshToken: refreshToken})
@@ -80,7 +80,7 @@ func (h *Handler) Refresh(c *fiber.Ctx) error {
 		return fiber.NewError(401, "Неправильный токен")
 	}
 
-	jwt, err := utils.NewJWT(user.ID, user.Role)
+	jwt, exp, err := utils.NewJWT(user.ID, user.Role)
 	if err != nil {
 		return fiber.NewError(500, err.Error())
 	}
@@ -95,7 +95,7 @@ func (h *Handler) Refresh(c *fiber.Ctx) error {
 		return fiber.NewError(500, "Ошибка при обновлении токена")
 	}
 
-	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken}
+	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
 
 	return c.JSON(tokens)
 }

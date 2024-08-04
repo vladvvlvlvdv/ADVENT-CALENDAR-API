@@ -9,7 +9,7 @@ import (
 
 func UserRouter(r fiber.Router) {
 	users := r.Group("/users")
-	users.Post("/login", handler.UserHandler.Login)
-	users.Get("/check", middleware.AuthMiddleware, handler.UserHandler.Check)
-	users.Patch("/refresh", handler.UserHandler.Refresh)
+	users.Post("/login", handler.Login)
+	users.Get("/check", middleware.AuthMiddleware, handler.Check)
+	users.Patch("/refresh", handler.Refresh)
 }

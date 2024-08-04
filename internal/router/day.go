@@ -12,7 +12,9 @@ func DayRouter(r fiber.Router) {
 	dayUpload := []utils.Upload{{FileKey: "attachments"}}
 
 	days := r.Group("/days")
-	days.Post("/", middleware.AdminMiddleware, utils.UploadFiles(dayUpload), handler.DayHandler.Create)
-	days.Get("/", handler.DayHandler.GetAll)
+	days.Post("/", utils.UploadFiles(dayUpload), handler.CreateDay)
+	days.Put("/:id", utils.UploadFiles(dayUpload), handler.UpdateDay)
+	days.Get("/", handler.GetAllDays)
+	days.Get("/admin", middleware.AdminMiddleware, handler.GetAllDaysForAdmin)
 
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func AdminMiddleware(c *fiber.Ctx) error {
-	token, err := utils.GetBearerToken(c, "Authorization")
+	token, err := utils.CheckBearerToken(c, "Authorization")
 	if err != nil {
 		return fiber.NewError(401, err.Error())
 	}
