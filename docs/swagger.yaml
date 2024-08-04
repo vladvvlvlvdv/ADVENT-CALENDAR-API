@@ -30,8 +30,19 @@ definitions:
         type: string
       id:
         type: integer
+      isLongRead:
+        type: boolean
       title:
         type: string
+    type: object
+  repository.Setting:
+    properties:
+      id:
+        type: integer
+      month:
+        type: integer
+      showAllDays:
+        type: boolean
     type: object
   repository.User:
     properties:
@@ -179,6 +190,24 @@ paths:
       tags:
       - Days
   /api/settings:
+    get:
+      parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/repository.Setting'
+      tags:
+      - Settings
     put:
       parameters:
       - description: Authorization
@@ -255,6 +284,29 @@ paths:
       - Users
   /api/users/refresh:
     patch:
+      parameters:
+      - description: RefreshToken
+        in: header
+        name: RefreshToken
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Tokens'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+      tags:
+      - Users
+  /api/users/register:
+    post:
       parameters:
       - description: RefreshToken
         in: header

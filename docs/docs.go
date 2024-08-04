@@ -201,6 +201,34 @@ const docTemplate = `{
             }
         },
         "/api/settings": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/repository.Setting"
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "Settings"
@@ -351,6 +379,42 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/users/register": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "RefreshToken",
+                        "name": "RefreshToken",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Tokens"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -400,8 +464,25 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isLongRead": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "repository.Setting": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "showAllDays": {
+                    "type": "boolean"
                 }
             }
         },

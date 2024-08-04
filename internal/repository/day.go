@@ -9,6 +9,7 @@ type (
 		ID          uint         `json:"id"`
 		Title       string       `json:"title"`
 		Description string       `json:"description"`
+		IsLongRead  bool         `json:"isLongRead"`
 		Attachments []Attachment `json:"attachments,omitempty"`
 	}
 

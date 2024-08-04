@@ -73,3 +73,11 @@ func RenderDatabase() {
 		RefreshToken: adminRefresh,
 	})
 }
+
+func AddDefaultDays() {
+	days := []Day{
+		{Title: "Что может угрожать вашим данным и какие методы используют злоумышленники?", Description: "Что угрожает данным?\n Потеря\n Утечки и компрометация – ваши данные доступны не только вам\n", IsLongRead: false},
+	}
+
+	log.Println(days)
+}
