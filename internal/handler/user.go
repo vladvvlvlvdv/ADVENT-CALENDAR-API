@@ -6,6 +6,7 @@ import (
 	"advent-calendar/pkg/utils"
 	"advent-calendar/pkg/validators"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -98,4 +99,20 @@ func Refresh(c *fiber.Ctx) error {
 	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
 
 	return c.JSON(tokens)
+}
+
+// @Tags Users
+// @Param RefreshToken header string true "RefreshToken"
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Failure 401 {object} validators.GlobalHandlerResp
+// @Success 200 {object} Tokens
+// @Router /api/users/register [post]
+func Register(c *fiber.Ctx) error {
+	email := c.FormValue("email")
+
+	if !govalidator.IsExistingEmail(email) {
+		return fiber.NewError(400, "Некорректный Email")
+	}
+
+	return nil
 }

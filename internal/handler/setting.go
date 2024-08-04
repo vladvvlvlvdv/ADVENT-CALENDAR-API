@@ -31,5 +31,18 @@ func UpdateSettings(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Настройки обновлены"})
+}
 
+// @Tags Settings
+// @Param Authorization header string true "Authorization"
+// @Success 200 {object} validators.GlobalHandlerResp
+// @Failure 500 {object} repository.Setting
+// @Router /api/settings [get]
+func GetSettings(c *fiber.Ctx) error {
+	settings, err := repository.SettingService.Get()
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	return c.JSON(settings)
 }

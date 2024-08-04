@@ -18,7 +18,7 @@ type Claims struct {
 }
 
 func NewJWT(id uint, role string) (string, int64, error) {
-	exp := time.Now().Add(time.Minute * 1).Unix()
+	exp := time.Now().Add(time.Minute * 30).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":   id,

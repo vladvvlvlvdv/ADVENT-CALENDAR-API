@@ -26,3 +26,8 @@ func (u User) Get(where User) (User, error) {
 func (u User) Update(toUpdate User) error {
 	return DB.Model(&u).Where(u).Updates(&toUpdate).Error
 }
+
+func (u User) Create(newUser User) (User, error) {
+	err := DB.Create(&newUser).Error
+	return newUser, err
+}

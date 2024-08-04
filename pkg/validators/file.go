@@ -39,5 +39,5 @@ func GetFileType(filename string) string {
 		}
 	}
 
-	return ""
+	return "file"
 }

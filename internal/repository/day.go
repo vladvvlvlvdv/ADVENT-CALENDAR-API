@@ -18,9 +18,9 @@ type (
 	}
 
 	DayUPD struct {
-		Title         string `json:"title" form:"title" validate:"min=5"`
-		Description   string `json:"description" form:"description" validate:"min=5"`
-		AttachmentIds []uint `json:"attachmentIds" form:"attachmentIds"`
+		Title         string `form:"title" validate:"min=5"`
+		Description   string `form:"description" validate:"min=5"`
+		AttachmentIds []uint `form:"attachmentIds"`
 	}
 )
 
@@ -60,22 +60,16 @@ func (d Day) GetAll(params Params, where Day) ([]Day, error) {
 	return days, nil
 }
 
-func (d Day) Update(day DayDTO, files []utils.File) error {
-
-	if len(files) > 0 {
-		for _, file := range files {
-			d.Attachments = append(d.Attachments, Attachment{
-				Label: file.OriginalName,
-				URL:   file.Destination,
-				Type:  file.FileType,
-			})
-		}
+func (d *Day) Update(id uint, day DayUPD, files []utils.File) error {
+	if err := DB.Model(&d).Where("id = ?", id).Updates(Day{Title: day.Title, Description: day.Description}).Error; err != nil {
+		return err
 	}
 
-	d.Title = day.Title
-	d.Description = day.Description
+	if err := AttachmentService.CreateMany(files, id); err != nil {
+		return err
+	}
 
-	return DB.Model(&d).Updates(&d).Error
+	return nil
 }
 
 func (d Day) Get(where Day) (Day, error) {

@@ -172,14 +172,18 @@ func UpdateDay(c *fiber.Ctx) error {
 		}
 	}
 
-	// if err := repository.DayService.Create(*data, files["attachments"]); err != nil {
-	// 	if len(files) > 0 {
-	// 		if err := utils.DeleteFiles(files); err != nil {
-	// 			return fiber.NewError(500, err.Error())
-	// 		}
-	// 	}
-	// 	return fiber.NewError(500, "Ошибка при добавлении дня")
-	// }
+	if err := repository.AttachmentService.DeleteMany(attachmentsToDel); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	if err := repository.DayService.Update(uint(id), *data, files["attachments"]); err != nil {
+		if len(files) > 0 {
+			if err := utils.DeleteFiles(files); err != nil {
+				return fiber.NewError(500, err.Error())
+			}
+		}
+		return fiber.NewError(500, "Ошибка при обновлении дня")
+	}
 
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "День успешно обновлен"})
 }

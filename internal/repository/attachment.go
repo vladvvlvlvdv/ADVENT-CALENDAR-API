@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"advent-calendar/pkg/utils"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"gorm.io/gorm"
@@ -18,9 +20,41 @@ type (
 	}
 )
 
+var AttachmentService = new(Attachment)
+
 func (a Attachment) DeleteMany(ids []uint) error {
-	if err := DB.Model(a).Where("id IN(?)", ids).Delete(Attachment{}).Error; err != nil {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	var attIds []Attachment
+	for _, id := range ids {
+		attIds = append(attIds, Attachment{ID: id})
+	}
+
+	if err := DB.Model(&a).Delete(&attIds).Error; err != nil {
 		return errors.New("Ошибка при удалении вложений")
+	}
+
+	return nil
+}
+
+func (a Attachment) CreateMany(files []utils.File, dayId uint) error {
+	if len(files) > 0 {
+		var attachments []Attachment
+
+		for _, file := range files {
+			attachments = append(attachments, Attachment{
+				Label: file.OriginalName,
+				URL:   file.Destination,
+				Type:  file.FileType,
+				DayID: dayId,
+			})
+		}
+
+		if err := DB.Create(&attachments).Error; err != nil {
+			return errors.New("Ошибка при создании вложений")
+		}
 	}
 
 	return nil
@@ -28,6 +62,7 @@ func (a Attachment) DeleteMany(ids []uint) error {
 
 func (a *Attachment) BeforeDelete(tx *gorm.DB) (err error) {
 
+	log.Println(a)
 	os.Remove(fmt.Sprintf("./%s", a.URL))
 
 	return
