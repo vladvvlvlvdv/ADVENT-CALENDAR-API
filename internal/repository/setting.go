@@ -27,5 +27,5 @@ func (s *Setting) Get() (*Setting, error) {
 }
 
 func (s Setting) Update(toUpdate Setting) error {
-	return DB.Model(&s).Where("1").Updates(&toUpdate).Error
+	return DB.Model(&s).Where("1").Update("month", toUpdate.Month).Update("show_all_days", toUpdate.ShowAllDays).Error
 }

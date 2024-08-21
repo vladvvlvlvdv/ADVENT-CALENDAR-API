@@ -7,7 +7,6 @@ import (
 	"advent-calendar/pkg/validators"
 	"fmt"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -38,18 +37,38 @@ func Login(c *fiber.Ctx) error {
 		return fiber.NewError(401, "Неправильный логин")
 	}
 
-	if !utils.CheckPasswordHash(data.Password, user.Password) {
-		return fiber.NewError(401, "Неправильный пароль")
+	if user.Role == "admin" {
+		if !utils.CheckPasswordHash(data.Password, user.Password) {
+			return fiber.NewError(401, "Неправильный пароль")
+		}
+
+		jwt, exp, err := utils.NewJWT(user.ID, user.Role)
+		if err != nil {
+			return fiber.NewError(500, err.Error())
+		}
+
+		tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
+
+		return c.JSON(tokens)
+	}
+	code := utils.GenerateCode()
+
+	if len(user.Email) > 0 {
+		if err := user.Update(repository.User{Code: code}); err != nil {
+			return fiber.NewError(500, err.Error())
+		}
+	} else {
+		if _, err := repository.UserService.Create(repository.User{Email: user.Email, Code: code}); err != nil {
+			return fiber.NewError(500, err.Error())
+		}
 	}
 
-	jwt, exp, err := utils.NewJWT(user.ID, user.Role)
-	if err != nil {
-		return fiber.NewError(500, err.Error())
+	if err := utils.SendMail(user.Email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
+		return fiber.NewError(500, "Ошибка при отправке письма")
 	}
 
-	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Проверьте Ваш email, для продолжения регистрации"})
 
-	return c.JSON(tokens)
 }
 
 // @Tags Users
@@ -100,32 +119,6 @@ func Refresh(c *fiber.Ctx) error {
 	tokens := Tokens{AccessToken: jwt, RefreshToken: user.RefreshToken, Exp: exp}
 
 	return c.JSON(tokens)
-}
-
-// @Tags Users
-// @Param Email formData string true "Email"
-// @Failure 500 {object} validators.GlobalHandlerResp
-// @Failure 401 {object} validators.GlobalHandlerResp
-// @Success 200 {object} validators.GlobalHandlerResp
-// @Router /api/users/register [post]
-func Register(c *fiber.Ctx) error {
-	email := c.FormValue("email")
-
-	if !govalidator.IsExistingEmail(email) {
-		return fiber.NewError(400, "Некорректный Email")
-	}
-
-	code := utils.GenerateCode()
-
-	if _, err := repository.UserService.Create(repository.User{Email: email, Code: code}); err != nil {
-		return fiber.NewError(500, err.Error())
-	}
-
-	if err := utils.SendMail(email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
-		return fiber.NewError(500, "Ошибка при отправке письма")
-	}
-
-	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Проверьте Ваш email, для продолжения регистрации"})
 }
 
 // @Tags Users
