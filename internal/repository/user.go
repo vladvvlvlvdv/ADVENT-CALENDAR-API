@@ -23,6 +23,7 @@ type (
 		Role         string `json:"role" gorm:"not null; default:user"`
 		RefreshToken string `json:"refreshToken" gorm:"not null"`
 		Code         string `json:"code"`
+		Days         []Day  `gorm:"many2many:days_views;"`
 	}
 )
 

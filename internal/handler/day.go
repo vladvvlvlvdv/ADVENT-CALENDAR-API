@@ -187,3 +187,17 @@ func UpdateDay(c *fiber.Ctx) error {
 
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "День успешно обновлен"})
 }
+
+func CreateDayView(c *fiber.Ctx) error {
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return fiber.NewError(400, "Некорректный ID")
+	}
+	userClaims := c.Locals("user").(utils.Claims)
+
+	if err := repository.DayService.CreateView(repository.DayView{UserID: userClaims.ID, DayID: uint(id)}); err != nil {
+		return fiber.NewError(500, "Ошибка при создании просмотра дня")
+	}
+
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Просмотр засчитан"})
+}

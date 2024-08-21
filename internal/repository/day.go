@@ -11,6 +11,7 @@ type (
 		Description string       `json:"description"`
 		IsLongRead  bool         `json:"isLongRead"`
 		Attachments []Attachment `json:"attachments,omitempty"`
+		Users       []User       `gorm:"many2many:days_views;"`
 	}
 
 	DayDTO struct {
@@ -22,6 +23,11 @@ type (
 		Title         string `form:"title" validate:"min=5"`
 		Description   string `form:"description" validate:"min=5"`
 		AttachmentIds []uint `form:"attachmentIds"`
+	}
+
+	DayView struct {
+		UserID uint `gorm:"primaryKey"`
+		DayID  uint `gorm:"primaryKey"`
 	}
 )
 
@@ -79,4 +85,8 @@ func (d Day) Get(where Day) (Day, error) {
 	}
 
 	return d, nil
+}
+
+func (d Day) CreateView(newView DayView) error {
+	return DB.Model(DayView{}).Where(newView).FirstOrCreate(&newView).Error
 }
