@@ -148,7 +148,7 @@ func ConfirmRegister(c *fiber.Ctx) error {
 		return fiber.NewError(500, err.Error())
 	}
 
-	if err := user.Update(repository.User{Code: "", RefreshToken: refreshToken}); err != nil {
+	if err := user.Update(repository.User{Code: " ", RefreshToken: refreshToken}); err != nil {
 		return fiber.NewError(500, err.Error())
 	}
 

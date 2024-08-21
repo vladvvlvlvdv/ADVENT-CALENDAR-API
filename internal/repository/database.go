@@ -55,7 +55,6 @@ func AutoMigrate() {
 		&Setting{},
 		&User{},
 		&Click{},
-		&DayView{},
 	); err != nil {
 		log.Fatal("Ошибка миграции таблиц")
 	}

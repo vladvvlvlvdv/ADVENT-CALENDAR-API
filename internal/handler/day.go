@@ -195,7 +195,7 @@ func CreateDayView(c *fiber.Ctx) error {
 	}
 	userClaims := c.Locals("user").(utils.Claims)
 
-	if err := repository.DayService.CreateView(repository.DayView{UserID: userClaims.ID, DayID: uint(id)}); err != nil {
+	if err := repository.DayService.CreateView(userClaims.ID, uint(id)); err != nil {
 		return fiber.NewError(500, "Ошибка при создании просмотра дня")
 	}
 

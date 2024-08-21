@@ -24,11 +24,6 @@ type (
 		Description   string `form:"description" validate:"min=5"`
 		AttachmentIds []uint `form:"attachmentIds"`
 	}
-
-	DayView struct {
-		UserID uint `gorm:"primaryKey"`
-		DayID  uint `gorm:"primaryKey"`
-	}
 )
 
 var DayService = new(Day)
@@ -87,6 +82,6 @@ func (d Day) Get(where Day) (Day, error) {
 	return d, nil
 }
 
-func (d Day) CreateView(newView DayView) error {
-	return DB.Model(DayView{}).Where(newView).FirstOrCreate(&newView).Error
+func (d Day) CreateView(userID, dayID uint) error {
+	return DB.Model(&User{ID: userID}).Association("Days").Append(&Day{ID: dayID})
 }

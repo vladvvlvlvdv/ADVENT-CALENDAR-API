@@ -3,6 +3,8 @@ package repository
 import (
 	"errors"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type (
@@ -48,4 +50,16 @@ func (u User) Create(newUser User) (User, error) {
 		}
 	}
 	return newUser, nil
+}
+
+func (u User) GetAll(where User) ([]User, error) {
+	var users []User
+
+	if err := DB.Where(&where).Preload("Days", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id")
+	}).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
