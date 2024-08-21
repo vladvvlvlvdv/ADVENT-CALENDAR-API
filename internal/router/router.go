@@ -6,4 +6,5 @@ func LoadRoutes(r fiber.Router) {
 	DayRouter(r)
 	UserRouter(r)
 	SettingRouter(r)
+	ClickRouter(r)
 }

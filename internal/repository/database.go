@@ -54,6 +54,7 @@ func AutoMigrate() {
 		&Attachment{},
 		&Setting{},
 		&User{},
+		&Click{},
 	); err != nil {
 		log.Fatal("Ошибка миграции таблиц")
 	}
