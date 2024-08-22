@@ -32,10 +32,7 @@ func Login(c *fiber.Ctx) error {
 		return validators.ValidateError(errs)
 	}
 
-	user, err := repository.UserService.Get(repository.User{Email: data.Email})
-	if err != nil {
-		return fiber.NewError(401, "Неправильный логин")
-	}
+	user, _ := repository.UserService.Get(repository.User{Email: data.Email})
 
 	if user.Role == "admin" {
 		if !utils.CheckPasswordHash(data.Password, user.Password) {
@@ -58,7 +55,7 @@ func Login(c *fiber.Ctx) error {
 			return fiber.NewError(500, err.Error())
 		}
 	} else {
-		if _, err := repository.UserService.Create(repository.User{Email: user.Email, Code: code}); err != nil {
+		if _, err := repository.UserService.Create(repository.User{Email: data.Email, Code: code}); err != nil {
 			return fiber.NewError(500, err.Error())
 		}
 	}
