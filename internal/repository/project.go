@@ -52,5 +52,7 @@ func (p *Project) Delete() error {
 }
 
 func (p *Project) BeforeDelete(tx *gorm.DB) (err error) {
-	return os.Remove(fmt.Sprintf("./%s", p.Preview))
+	os.Remove(fmt.Sprintf("./%s", p.Preview))
+
+	return
 }
