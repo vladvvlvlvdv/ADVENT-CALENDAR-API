@@ -5,7 +5,7 @@ import (
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
 	"advent-calendar/pkg/validators"
-	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -60,7 +60,17 @@ func Login(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := utils.SendMail(data.Email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
+	type ToSend struct {
+		Code string
+		Year int
+	}
+
+	body, err := utils.LoadTemplate("registration.email", ToSend{Code: code, Year: time.Now().Year()})
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	if err := utils.SendMail(data.Email, "Завершение регистрации - Кибербезопасный Новый год", body.String()); err != nil {
 		return fiber.NewError(500, "Ошибка при отправке письма")
 	}
 
@@ -201,6 +211,10 @@ func UnSubscribe(c *fiber.Ctx) error {
 
 	if err := repository.UserService.UnSubscribe(data.Email); err != nil {
 		return fiber.NewError(500, err.Error())
+	}
+
+	if c.Method() == "GET" {
+		return c.Redirect(config.Config.CLIENT_URI)
 	}
 
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Подписка отменена"})

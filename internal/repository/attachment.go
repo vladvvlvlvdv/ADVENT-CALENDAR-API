@@ -4,7 +4,6 @@ import (
 	"advent-calendar/pkg/utils"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	"gorm.io/gorm"
@@ -61,9 +60,5 @@ func (a Attachment) CreateMany(files []utils.File, dayId uint) error {
 }
 
 func (a *Attachment) BeforeDelete(tx *gorm.DB) (err error) {
-
-	log.Println(a)
-	os.Remove(fmt.Sprintf("./%s", a.URL))
-
-	return
+	return os.Remove(fmt.Sprintf("./%s", a.URL))
 }

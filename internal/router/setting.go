@@ -10,5 +10,5 @@ import (
 func SettingRouter(r fiber.Router) {
 	settings := r.Group("/settings")
 	settings.Put("/", middleware.AdminMiddleware, handler.UpdateSettings)
-	settings.Get("/", middleware.AdminMiddleware, handler.GetSettings)
+	settings.Get("/", handler.GetSettings)
 }

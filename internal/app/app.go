@@ -2,10 +2,12 @@ package app
 
 import (
 	"advent-calendar/internal/config"
+	"advent-calendar/internal/mail"
 	"advent-calendar/internal/router"
 	"advent-calendar/pkg/validators"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -39,13 +41,13 @@ func (a *App) Run() {
 		a.Server.Get("/swagger/*", swagger.HandlerDefault)
 	}
 
-	// go func() {
-	// 	for {
-	// 		if time.Now().Hour() == 0 && time.Now().Minute() == 0 {
-	// 			mail.ScheduleSendEmailsToUsers()
-	// 		}
-	// 	}
-	// }()
+	go func() {
+		for {
+			if time.Now().Hour() == 0 && time.Now().Minute() == 0 {
+				mail.ScheduleSendEmailsToUsers()
+			}
+		}
+	}()
 
 	//mail.ScheduleSendEmailsToUsers()
 

@@ -81,7 +81,12 @@ func (u User) GetAll(where User) ([]User, error) {
 }
 
 func (u User) Subscribe(s *SubscribeDTO) error {
-	if err := DB.Where("email =?", s.Email).First(&Subscribe{}).Error; err == nil {
+	if err := DB.Model(Subscribe{}).
+		Create(&Subscribe{
+			Email:      s.Email,
+			Nickname:   s.Nickname,
+			TgUsername: s.TgUsername,
+		}).Error; err != nil {
 		return errors.New("На этот email подписка уже есть")
 	}
 	return nil

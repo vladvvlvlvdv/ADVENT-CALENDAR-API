@@ -27,13 +27,17 @@ type ConfigStruct struct {
 	SMTP_PORT     string
 	SMTP_USER     string
 	SMTP_PASSWORD string
+
+	MAIL_URI   string
+	CLIENT_URI string
 }
 
 var (
 	Config      ConfigStruct
-	directories = [2]string{
+	directories = [3]string{
 		"public",
 		"public/attachments",
+		"public/previews",
 	}
 	Validator = &validators.XValidator{
 		Validator: validators.Validate,

@@ -2,7 +2,10 @@ package utils
 
 import (
 	"advent-calendar/pkg/validators"
+	"bytes"
 	"fmt"
+	"html/template"
+	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -62,6 +65,7 @@ func UploadFiles(uploads []Upload) func(c *fiber.Ctx) error {
 				destination := fmt.Sprintf("./public/%s/%s", upl.FileKey, GenerateUniqueFilename(file))
 
 				if err := c.SaveFile(file, destination); err != nil {
+					log.Println(err)
 					return fiber.NewError(500, "Ошибка сохранения файла")
 				}
 
@@ -89,4 +93,18 @@ func DeleteFiles(files map[string][]File) error {
 		}
 	}
 	return nil
+}
+
+func LoadTemplate(filename string, data interface{}) (bytes.Buffer, error) {
+	tmpl, err := template.ParseFiles(fmt.Sprintf("./internal/templates/%s.html", filename))
+	if err != nil {
+		return bytes.Buffer{}, err
+	}
+
+	var body bytes.Buffer
+	if err := tmpl.Execute(&body, data); err != nil {
+		return bytes.Buffer{}, err
+	}
+
+	return body, nil
 }

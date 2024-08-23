@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"advent-calendar/internal/config"
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
 	"fmt"
@@ -39,20 +40,63 @@ func ScheduleSendEmailsToUsers() {
 		toSendEmails[user.Email] = mail{skipedDaysCount: skipedDaysCount}
 	}
 
+	type ToSend struct {
+		UnSubscribeLink string
+		Year            int
+		Title           string
+		Text            string
+		ClientLink      string
+	}
+
+	year := time.Now().Year()
+
 	for email, toSend := range toSendEmails {
+		link := fmt.Sprintf("%s/api/users/subscribe?email=%s", config.Config.MAIL_URI, email)
+		clientLink := config.Config.CLIENT_URI
+
 		if toSend.skipedDaysCount > 0 {
-			if err := utils.SendMail(email,
-				"Кибербезопасный новый год",
-				fmt.Sprintf(`Вы еще не просмотрели %d %s <br>`,
-					toSend.skipedDaysCount,
-					utils.DeclOfNum(toSend.skipedDaysCount, [3]string{"рекомендацию", "рекомендации", "рекомендаций"}),
-				)); err != nil {
+			title := "Не просмотренные дни - Кибербезопасный новый год"
+
+			text := fmt.Sprintf(`Вы еще не просмотрели %d %s`,
+				toSend.skipedDaysCount,
+				utils.DeclOfNum(toSend.skipedDaysCount, [3]string{"рекомендацию", "рекомендации", "рекомендаций"}),
+			)
+
+			body, err := utils.LoadTemplate("message.email", ToSend{
+				Title:           title,
+				Text:            text,
+				Year:            year,
+				UnSubscribeLink: link,
+				ClientLink:      clientLink,
+			})
+			if err != nil {
+				log.Println("Error loading template:", err)
+				continue
+			}
+
+			if err := utils.SendMail(email, title, body.String()); err != nil {
 				log.Println("Error sending email to", email, ":", err)
 				continue
 			}
 		}
 
-		if err := utils.SendMail(email, "Кибербезопасный новый год", "Новый день - новая рекомендация! <br> Не пропусти полезный совет"); err != nil {
+		title := "Новая рекомендация - Кибербезопасный новый год"
+
+		text := "Новый день - новая рекомендация! Не пропусти полезный совет"
+
+		body, err := utils.LoadTemplate("message.email", ToSend{
+			Title:           title,
+			Text:            text,
+			Year:            year,
+			UnSubscribeLink: link,
+			ClientLink:      clientLink,
+		})
+		if err != nil {
+			log.Println("Error loading template:", err)
+			continue
+		}
+
+		if err := utils.SendMail(email, title, body.String()); err != nil {
 			log.Println("Error sending email to", email, ":", err)
 			continue
 		}

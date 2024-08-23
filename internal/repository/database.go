@@ -53,6 +53,7 @@ func AutoMigrate() {
 		&User{},
 		&Click{},
 		&Subscribe{},
+		&Project{},
 	); err != nil {
 		log.Fatal("Ошибка миграции таблиц")
 	}

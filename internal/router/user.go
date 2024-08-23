@@ -15,4 +15,5 @@ func UserRouter(r fiber.Router) {
 	users.Patch("/refresh", handler.Refresh)
 	users.Post("/subscribe", handler.Subscribe)
 	users.Delete("/subscribe", handler.UnSubscribe)
+	users.Get("/subscribe", handler.UnSubscribe)
 }
