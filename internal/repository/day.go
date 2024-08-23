@@ -11,7 +11,7 @@ type (
 		Description string       `json:"description"`
 		IsLongRead  bool         `json:"isLongRead"`
 		Attachments []Attachment `json:"attachments,omitempty"`
-		Users       []User       `gorm:"many2many:days_views;"`
+		Users       []Subscribe  `gorm:"many2many:days_views;" json:"-"`
 	}
 
 	DayDTO struct {
@@ -22,6 +22,7 @@ type (
 	DayUPD struct {
 		Title         string `form:"title" validate:"min=5"`
 		Description   string `form:"description" validate:"min=5"`
+		IsLongRead    bool   `form:"isLongRead" validate:"boolean"`
 		AttachmentIds []uint `form:"attachmentIds"`
 	}
 )
@@ -63,7 +64,11 @@ func (d Day) GetAll(params Params, where Day) ([]Day, error) {
 }
 
 func (d *Day) Update(id uint, day DayUPD, files []utils.File) error {
-	if err := DB.Model(&d).Where("id = ?", id).Updates(Day{Title: day.Title, Description: day.Description}).Error; err != nil {
+	if err := DB.Model(&d).Where("id = ?", id).
+		Update("title", day.Title).
+		Update("description", day.Description).
+		Update("is_long_read", day.IsLongRead).
+		Error; err != nil {
 		return err
 	}
 
@@ -82,6 +87,6 @@ func (d Day) Get(where Day) (Day, error) {
 	return d, nil
 }
 
-func (d Day) CreateView(userID, dayID uint) error {
-	return DB.Model(&User{ID: userID}).Association("Days").Append(&Day{ID: dayID})
+func (d Day) CreateView(subId, dayID uint) error {
+	return DB.Model(&Subscribe{ID: subId}).Association("Days").Append(&Day{ID: dayID})
 }

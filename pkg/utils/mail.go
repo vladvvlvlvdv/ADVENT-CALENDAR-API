@@ -2,6 +2,7 @@ package utils
 
 import (
 	"advent-calendar/internal/config"
+	"log"
 	"net/smtp"
 )
 
@@ -61,6 +62,7 @@ func SendMail(to, subject, body string) error {
 
 	err := smtp.SendMail(addr, auth, config.Config.SMTP_USER, []string{to}, message)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 

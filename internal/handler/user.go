@@ -60,7 +60,7 @@ func Login(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := utils.SendMail(user.Email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
+	if err := utils.SendMail(data.Email, "Завершение регистрации Кибербезопасный Новый год", fmt.Sprintf("Одноразовый код: %s", code)); err != nil {
 		return fiber.NewError(500, "Ошибка при отправке письма")
 	}
 
@@ -155,4 +155,28 @@ func ConfirmRegister(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(Tokens{AccessToken: jwt, RefreshToken: refreshToken, Exp: exp})
+}
+
+// @Tags Users
+// @Param request formData repository.SubscribeDTO true "-"
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Failure 400 {object} validators.GlobalHandlerResp
+// @Success 200 {object} validators.GlobalHandlerResp
+// @Router /api/users/subscribe [post]
+func Subscribe(c *fiber.Ctx) error {
+	data := new(repository.SubscribeDTO)
+
+	if err := c.BodyParser(data); err != nil {
+		return fiber.NewError(400, err.Error())
+	}
+
+	if errs := config.Validator.Validate(data); len(errs) > 0 && errs[0].Error {
+		return validators.ValidateError(errs)
+	}
+
+	if err := repository.UserService.Subscribe(data); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Подписка оформлена"})
 }

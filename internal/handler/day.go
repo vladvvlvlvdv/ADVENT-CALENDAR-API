@@ -7,6 +7,7 @@ import (
 	"advent-calendar/pkg/validators"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -188,14 +189,50 @@ func UpdateDay(c *fiber.Ctx) error {
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "День успешно обновлен"})
 }
 
+// @Tags Days
+// @Param id path int true " "
+// @Param email formData string true " "
+// @Success 200 {object} validators.GlobalHandlerResp
+// @Failure 400 {object} validators.GlobalHandlerResp
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Router /api/days/{id}/views [post]
 func CreateDayView(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return fiber.NewError(400, "Некорректный ID")
 	}
-	userClaims := c.Locals("user").(utils.Claims)
 
-	if err := repository.DayService.CreateView(userClaims.ID, uint(id)); err != nil {
+	email := c.FormValue("email")
+	if len(email) == 0 {
+		return fiber.NewError(400, "Не указан email")
+	}
+
+	if !govalidator.IsEmail(email) {
+		return fiber.NewError(400, "Некорректный email")
+	}
+
+	settings, err := repository.SettingService.Get()
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	if !settings.ShowAllDays {
+		if id > time.Now().Day() {
+			return fiber.NewError(404, "День еще не наступил")
+		}
+	}
+
+	sub, err := repository.UserService.GetSubscriber(repository.Subscribe{Email: email})
+	if err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	day, err := repository.DayService.Get(repository.Day{ID: uint(id)})
+	if err != nil {
+		return fiber.NewError(404, "День не найден")
+	}
+
+	if err := repository.DayService.CreateView(sub.ID, day.ID); err != nil {
 		return fiber.NewError(500, "Ошибка при создании просмотра дня")
 	}
 

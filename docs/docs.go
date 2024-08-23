@@ -162,6 +162,11 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
+                        "type": "boolean",
+                        "name": "isLongRead",
+                        "in": "formData"
+                    },
+                    {
                         "minLength": 5,
                         "type": "string",
                         "name": "title",
@@ -176,6 +181,49 @@ const docTemplate = `{
                         "description": " ",
                         "name": "attachments",
                         "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/validators.GlobalHandlerResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/days/{id}/views": {
+            "post": {
+                "tags": [
+                    "Days"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": " ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -363,11 +411,9 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minLength": 5,
                         "type": "string",
                         "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -422,16 +468,36 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/register": {
+        "/api/users/subscribe": {
             "post": {
                 "tags": [
                     "Users"
                 ],
                 "parameters": [
                     {
+                        "minLength": 5,
                         "type": "string",
-                        "description": "Email",
-                        "name": "Email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "isConfirm",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 5,
+                        "type": "string",
+                        "name": "nickname",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "minLength": 5,
+                        "type": "string",
+                        "name": "tgUsername",
                         "in": "formData",
                         "required": true
                     }
@@ -443,8 +509,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/validators.GlobalHandlerResp"
                         }
@@ -565,7 +631,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "172.23.116.163:9000",
+	Host:             "192.168.2.68:9000",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Advent Calendar API docs",

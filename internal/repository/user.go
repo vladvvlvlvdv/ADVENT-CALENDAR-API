@@ -18,6 +18,13 @@ type (
 		Email string `json:"email" form:"email" validate:"required,min=5,email"`
 	}
 
+	SubscribeDTO struct {
+		Email      string `form:"email" validate:"required,min=5,email"`
+		Nickname   string `form:"nickname" validate:"required,min=5"`
+		TgUsername string `form:"tgUsername" validate:"required,min=5"`
+		IsConfirm  bool   `form:"isConfirm" validate:"required,boolean"`
+	}
+
 	User struct {
 		ID           uint   `json:"id"`
 		Email        string `json:"email" gorm:"unique;not null"`
@@ -25,7 +32,14 @@ type (
 		Role         string `json:"role" gorm:"not null; default:user"`
 		RefreshToken string `json:"refreshToken" gorm:"not null"`
 		Code         string `json:"code"`
-		Days         []Day  `gorm:"many2many:days_views;"`
+	}
+
+	Subscribe struct {
+		ID         uint   `json:"id"`
+		Email      string `json:"email" gorm:"unique;not null"`
+		Nickname   string `json:"nickname"`
+		TgUsername string `json:"tgUsername"`
+		Days       []Day  `gorm:"many2many:days_views;" json:"-"`
 	}
 )
 
@@ -55,11 +69,35 @@ func (u User) Create(newUser User) (User, error) {
 func (u User) GetAll(where User) ([]User, error) {
 	var users []User
 
-	if err := DB.Where(&where).Preload("Days", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id")
-	}).Find(&users).Error; err != nil {
+	if err := DB.Where(&where).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
 	return users, nil
+}
+
+func (u User) Subscribe(s *SubscribeDTO) error {
+	return DB.Create(&Subscribe{Email: s.Email, Nickname: s.Nickname, TgUsername: s.TgUsername}).Error
+}
+
+func (u User) GetAllSubscribes() ([]Subscribe, error) {
+	var subs []Subscribe
+
+	if err := DB.Preload("Days", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id")
+	}).Find(&subs).Error; err != nil {
+		return nil, err
+	}
+
+	return subs, nil
+}
+
+func (u User) GetSubscriber(s Subscribe) (Subscribe, error) {
+	var sub Subscribe
+
+	if err := DB.Where(&s).First(&sub).Error; err != nil {
+		return Subscribe{}, err
+	}
+
+	return sub, nil
 }

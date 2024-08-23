@@ -64,7 +64,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: 172.23.116.163:9000
+host: 192.168.2.68:9000
 info:
   contact: {}
   title: Advent Calendar API docs
@@ -149,6 +149,9 @@ paths:
         name: description
         type: string
       - in: formData
+        name: isLongRead
+        type: boolean
+      - in: formData
         minLength: 5
         name: title
         type: string
@@ -159,6 +162,34 @@ paths:
           type: file
         name: attachments
         type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+      tags:
+      - Days
+  /api/days/{id}/views:
+    post:
+      parameters:
+      - description: ' '
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ' '
+        in: formData
+        name: email
+        required: true
+        type: string
       responses:
         "200":
           description: OK
@@ -296,9 +327,7 @@ paths:
         required: true
         type: string
       - in: formData
-        minLength: 5
         name: password
-        required: true
         type: string
       responses:
         "200":
@@ -334,12 +363,26 @@ paths:
             $ref: '#/definitions/validators.GlobalHandlerResp'
       tags:
       - Users
-  /api/users/register:
+  /api/users/subscribe:
     post:
       parameters:
-      - description: Email
-        in: formData
-        name: Email
+      - in: formData
+        minLength: 5
+        name: email
+        required: true
+        type: string
+      - in: formData
+        name: isConfirm
+        required: true
+        type: boolean
+      - in: formData
+        minLength: 5
+        name: nickname
+        required: true
+        type: string
+      - in: formData
+        minLength: 5
+        name: tgUsername
         required: true
         type: string
       responses:
@@ -347,8 +390,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/validators.GlobalHandlerResp'
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/validators.GlobalHandlerResp'
         "500":

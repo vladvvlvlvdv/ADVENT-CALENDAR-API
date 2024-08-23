@@ -16,6 +16,6 @@ func DayRouter(r fiber.Router) {
 	days.Put("/:id", middleware.AdminMiddleware, utils.UploadFiles(dayUpload), handler.UpdateDay)
 	days.Get("/", handler.GetAllDays)
 	days.Get("/admin", middleware.AdminMiddleware, handler.GetAllDaysForAdmin)
-	days.Post("/:id/views", middleware.AuthMiddleware, handler.CreateDayView)
+	days.Post("/:id/views", handler.CreateDayView)
 
 }
