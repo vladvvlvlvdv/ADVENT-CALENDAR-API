@@ -2,7 +2,6 @@ package app
 
 import (
 	"advent-calendar/internal/config"
-	"advent-calendar/internal/mail"
 	"advent-calendar/internal/router"
 	"advent-calendar/pkg/validators"
 	"fmt"
@@ -48,7 +47,7 @@ func (a *App) Run() {
 	// 	}
 	// }()
 
-	mail.ScheduleSendEmailsToUsers()
+	//mail.ScheduleSendEmailsToUsers()
 
 	router.LoadRoutes(a.Server.Group("/api"))
 	err := a.Server.Listen(fmt.Sprintf(":%s", config.Config.PORT))

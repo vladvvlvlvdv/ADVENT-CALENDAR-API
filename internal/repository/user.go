@@ -25,6 +25,10 @@ type (
 		IsConfirm  bool   `form:"isConfirm" validate:"required,boolean"`
 	}
 
+	UnSubscribeDTO struct {
+		Email string `json:"email" validate:"required,min=5,email"`
+	}
+
 	User struct {
 		ID           uint   `json:"id"`
 		Email        string `json:"email" gorm:"unique;not null"`
@@ -77,7 +81,10 @@ func (u User) GetAll(where User) ([]User, error) {
 }
 
 func (u User) Subscribe(s *SubscribeDTO) error {
-	return DB.Create(&Subscribe{Email: s.Email, Nickname: s.Nickname, TgUsername: s.TgUsername}).Error
+	if err := DB.Where("email =?", s.Email).First(&Subscribe{}).Error; err == nil {
+		return errors.New("На этот email подписка уже есть")
+	}
+	return nil
 }
 
 func (u User) GetAllSubscribes() ([]Subscribe, error) {
@@ -100,4 +107,8 @@ func (u User) GetSubscriber(s Subscribe) (Subscribe, error) {
 	}
 
 	return sub, nil
+}
+
+func (u User) UnSubscribe(email string) error {
+	return DB.Where("email = ?", email).Delete(&Subscribe{}).Error
 }

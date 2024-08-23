@@ -14,4 +14,5 @@ func UserRouter(r fiber.Router) {
 	users.Get("/check", middleware.AuthMiddleware, handler.Check)
 	users.Patch("/refresh", handler.Refresh)
 	users.Post("/subscribe", handler.Subscribe)
+	users.Delete("/subscribe", handler.UnSubscribe)
 }

@@ -364,6 +364,28 @@ paths:
       tags:
       - Users
   /api/users/subscribe:
+    delete:
+      parameters:
+      - in: query
+        minLength: 5
+        name: email
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/validators.GlobalHandlerResp'
+      tags:
+      - Users
     post:
       parameters:
       - in: formData

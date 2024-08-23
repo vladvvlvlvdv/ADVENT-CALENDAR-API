@@ -180,3 +180,28 @@ func Subscribe(c *fiber.Ctx) error {
 
 	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Подписка оформлена"})
 }
+
+// @Tags Users
+// @Param request query repository.UnSubscribeDTO true "-"
+// @Failure 500 {object} validators.GlobalHandlerResp
+// @Failure 400 {object} validators.GlobalHandlerResp
+// @Success 200 {object} validators.GlobalHandlerResp
+// @Router /api/users/subscribe [delete]
+func UnSubscribe(c *fiber.Ctx) error {
+	data := new(repository.UnSubscribeDTO)
+
+	err := c.QueryParser(data)
+	if err != nil {
+		return fiber.NewError(400, err.Error())
+	}
+
+	if errs := config.Validator.Validate(data); len(errs) > 0 && errs[0].Error {
+		return validators.ValidateError(errs)
+	}
+
+	if err := repository.UserService.UnSubscribe(data.Email); err != nil {
+		return fiber.NewError(500, err.Error())
+	}
+
+	return c.JSON(validators.GlobalHandlerResp{Success: true, Message: "Подписка отменена"})
+}
