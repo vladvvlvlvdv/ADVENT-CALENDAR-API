@@ -43,7 +43,7 @@ type (
 		Email      string `json:"email" gorm:"unique;not null"`
 		Nickname   string `json:"nickname"`
 		TgUsername string `json:"tgUsername"`
-		Days       []Day  `gorm:"many2many:days_views;" json:"-"`
+		Days       []Day  `gorm:"many2many:days_views;constraint:OnDelete:CASCADE;" json:"-"`
 	}
 )
 
