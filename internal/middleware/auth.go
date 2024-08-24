@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +19,18 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	}
 
 	c.Locals("user", user)
+
+	return c.Next()
+}
+
+func WithoutAuthMiddleware(c *fiber.Ctx) error {
+	token, _ := utils.CheckBearerToken(c, "Authorization")
+
+	user, _ := utils.VerifyToken(token)
+
+	dbUser, _ := repository.UserService.Get(repository.User{ID: user.ID})
+
+	c.Locals("user", dbUser)
 
 	return c.Next()
 }

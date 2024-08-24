@@ -32,6 +32,8 @@ definitions:
         type: integer
       isLongRead:
         type: boolean
+      isViewed:
+        type: boolean
       title:
         type: string
     type: object
@@ -86,6 +88,14 @@ paths:
   /api/days:
     get:
       parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        type: string
+      - description: Subscriber email
+        in: query
+        name: Subscriber
+        type: string
       - description: Например Europe/Samara
         in: query
         name: timeZone
@@ -193,6 +203,10 @@ paths:
   /api/days/{id}/views:
     post:
       parameters:
+      - description: Authorization
+        in: header
+        name: Authorization
+        type: string
       - description: ' '
         in: path
         name: id
@@ -201,7 +215,6 @@ paths:
       - description: ' '
         in: formData
         name: email
-        required: true
         type: string
       responses:
         "200":

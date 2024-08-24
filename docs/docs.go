@@ -23,6 +23,18 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Subscriber email",
+                        "name": "Subscriber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Например Europe/Samara",
                         "name": "timeZone",
                         "in": "query"
@@ -212,6 +224,12 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header"
+                    },
+                    {
                         "type": "integer",
                         "description": " ",
                         "name": "id",
@@ -222,8 +240,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": " ",
                         "name": "email",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -795,6 +812,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "isLongRead": {
+                    "type": "boolean"
+                },
+                "isViewed": {
                     "type": "boolean"
                 },
                 "title": {

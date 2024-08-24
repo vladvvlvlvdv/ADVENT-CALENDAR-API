@@ -55,12 +55,15 @@ func CreateDay(c *fiber.Ctx) error {
 }
 
 // @Tags Days
+// @Param Authorization header string false "Authorization"
+// @Param Subscriber query string false "Subscriber email"
 // @Param timeZone query string false "Например Europe/Samara"
 // @Success 200 {object} []repository.Day
 // @Failrule 500 {object} validators.GlobalHandlerResp
 // @Router /api/days [get]
 func GetAllDays(c *fiber.Ctx) error {
 	timeZone := c.Query("timeZone")
+	email := c.Query("Subscriber")
 
 	setting, err := repository.SettingService.Get()
 	if err != nil {
@@ -78,8 +81,27 @@ func GetAllDays(c *fiber.Ctx) error {
 
 	daysCount := utils.GetDaysCount(setting.Month, day, setting.ShowAllDays)
 
-	days, err := repository.DayService.GetAll(repository.Params{}, repository.Day{ID: uint(daysCount)})
+	user := c.Locals("user").(repository.User)
 
+	var params repository.Params
+
+	if user.ID != 0 || email != "" {
+		var subWhere = repository.Subscribe{}
+
+		if user.ID != 0 {
+			subWhere.Email = user.Email
+		}
+		if email != "" {
+			subWhere.Email = email
+		}
+
+		sub, err := repository.UserService.GetSubscriber(subWhere)
+		if err == nil {
+			params.SubscribeId = sub.ID
+		}
+	}
+
+	days, err := repository.DayService.GetAll(params, repository.Day{ID: uint(daysCount)})
 	if err != nil {
 		return fiber.NewError(500, "Ошибка при получении списка дней")
 	}
@@ -190,8 +212,9 @@ func UpdateDay(c *fiber.Ctx) error {
 }
 
 // @Tags Days
+// @Param Authorization header string false "Authorization"
 // @Param id path int true " "
-// @Param email formData string true " "
+// @Param email formData string false " "
 // @Success 200 {object} validators.GlobalHandlerResp
 // @Failure 400 {object} validators.GlobalHandlerResp
 // @Failure 500 {object} validators.GlobalHandlerResp
@@ -203,6 +226,16 @@ func CreateDayView(c *fiber.Ctx) error {
 	}
 
 	email := c.FormValue("email")
+
+	user := c.Locals("user").(repository.User)
+
+	if user.ID != 0 {
+		sub, err := repository.UserService.GetSubscriber(repository.Subscribe{Email: user.Email})
+		if err == nil {
+			email = sub.Email
+		}
+	}
+
 	if len(email) == 0 {
 		return fiber.NewError(400, "Не указан email")
 	}

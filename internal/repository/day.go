@@ -10,6 +10,7 @@ type (
 		Title       string       `json:"title"`
 		Description string       `json:"description"`
 		IsLongRead  bool         `json:"isLongRead"`
+		IsViewed    bool         `json:"isViewed"`
 		Attachments []Attachment `json:"attachments,omitempty"`
 		Users       []Subscribe  `gorm:"many2many:days_views;" json:"-"`
 	}
@@ -50,7 +51,16 @@ func (d Day) Create(day DayDTO, files []utils.File) error {
 func (d Day) GetAll(params Params, where Day) ([]Day, error) {
 	var days []Day
 
-	query := DB.Model(&d).Where("id <= ?", where.ID).Preload("Attachments")
+	subQuery := DB.Table("days_views").
+		Select("true").
+		Where("days_views.day_id = days.id").
+		Where("days_views.subscribe_id = ?", params.SubscribeId).
+		Limit(1)
+
+	query := DB.Model(&d).
+		Select("days.*, (?) AS is_viewed", subQuery).
+		Where("days.id <= ?", where.ID).
+		Preload("Attachments")
 
 	if params.Limit > 0 {
 		query = query.Limit(params.Limit).Offset((params.Page - 1) * params.Limit)
