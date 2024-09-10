@@ -58,6 +58,8 @@ definitions:
         type: integer
       showAllDays:
         type: boolean
+      year:
+        type: integer
     type: object
   repository.User:
     properties:

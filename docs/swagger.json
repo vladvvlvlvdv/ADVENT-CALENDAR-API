@@ -846,6 +846,9 @@
                 },
                 "showAllDays": {
                     "type": "boolean"
+                },
+                "year": {
+                    "type": "integer"
                 }
             }
         },

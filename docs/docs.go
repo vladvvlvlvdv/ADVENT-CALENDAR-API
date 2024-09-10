@@ -853,6 +853,9 @@ const docTemplate = `{
                 },
                 "showAllDays": {
                     "type": "boolean"
+                },
+                "year": {
+                    "type": "integer"
                 }
             }
         },

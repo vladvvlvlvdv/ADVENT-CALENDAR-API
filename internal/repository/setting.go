@@ -9,6 +9,7 @@ type (
 		ID          uint `json:"id"`
 		Month       int  `json:"month" gorm:"not null"`
 		ShowAllDays bool `json:"showAllDays" gorm:"type:boolean;not null;default:false"`
+		Year        int  `json:"year" gorm:"-"`
 	}
 )
 

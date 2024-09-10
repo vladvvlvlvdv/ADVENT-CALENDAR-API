@@ -11,7 +11,7 @@ import (
 // @title Advent Calendar API docs
 // @version 1.0
 
-// @host 172.23.116.163:9000
+// @host localhost:9000
 // @BasePath /
 
 func main() {

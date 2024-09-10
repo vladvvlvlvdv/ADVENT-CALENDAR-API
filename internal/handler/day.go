@@ -63,7 +63,7 @@ func CreateDay(c *fiber.Ctx) error {
 // @Router /api/days [get]
 func GetAllDays(c *fiber.Ctx) error {
 	timeZone := c.Query("timeZone")
-	email := c.Query("Subscriber")
+	email := c.Query("subscriber")
 
 	setting, err := repository.SettingService.Get()
 	if err != nil {

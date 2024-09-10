@@ -4,6 +4,7 @@ import (
 	"advent-calendar/internal/config"
 	"advent-calendar/internal/repository"
 	"advent-calendar/pkg/validators"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -43,6 +44,8 @@ func GetSettings(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(500, err.Error())
 	}
+
+	settings.Year = time.Now().Year()
 
 	return c.JSON(settings)
 }
