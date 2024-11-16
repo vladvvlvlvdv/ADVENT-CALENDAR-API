@@ -43,6 +43,10 @@ jobs:
         echo "MySQL is not ready in time."
         exit 1
 
+    - name: Root user mysql accesses
+      run: docker exec db mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '${{ secrets.DB_PASSWORD }}'; FLUSH PRIVILEGES;"
+
+
     - name: Check mysql
       run: docker exec db mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "USE advent_calendar; SELECT 'Database exists!' AS Result;"
 
