@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "advent-calendar/docs"
 	"advent-calendar/internal/app"
 	"advent-calendar/internal/config"
 	"advent-calendar/internal/repository"

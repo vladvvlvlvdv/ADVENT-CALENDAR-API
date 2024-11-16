@@ -8,3 +8,6 @@ build:
 
 swag:
 	swag init -g cmd/main.go
+
+test:
+	MODE="test" go test ./... -v

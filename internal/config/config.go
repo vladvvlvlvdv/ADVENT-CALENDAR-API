@@ -45,8 +45,17 @@ var (
 )
 
 func LoadConfig() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Ошибка загрузки .env файла: %v", err)
+
+	if os.Getenv("MODE") == "test" {
+		err := godotenv.Load(".test.env")
+		if err != nil {
+			log.Fatalf("Ошибка загрузки .test.env файла: %v", err)
+		}
+	} else {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatalf("Ошибка загрузки .env файла: %v", err)
+		}
 	}
 
 	setConfigFields(&Config)

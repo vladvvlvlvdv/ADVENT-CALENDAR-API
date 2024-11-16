@@ -3,25 +3,20 @@ module advent-calendar
 go 1.22.5
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/joho/godotenv v1.5.1
+	github.com/stretchr/testify v1.9.0
 	golang.org/x/crypto v0.25.0
 )
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/russross/blackfriday/v2 v2.0.1 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/swaggo/fiber-swagger v1.3.0 // indirect
-	github.com/swaggo/files v1.0.1 // indirect
-	github.com/urfave/cli/v2 v2.3.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
 
 require (
