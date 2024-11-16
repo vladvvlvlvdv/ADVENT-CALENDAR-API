@@ -42,7 +42,7 @@ func LoadDatabase() {
 
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{ /*Logger: newLogger*/ })
 	if err != nil {
-		log.Fatal("Ошибка подключения к базе данных")
+		log.Fatalf("Ошибка подключения к базе данных %s", config.Config.DB_NAME)
 	}
 }
 
