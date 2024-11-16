@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Go
 
 on:
@@ -15,7 +12,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -33,9 +30,21 @@ jobs:
     - name: Install DB
       run: docker compose up -d
 
+    - name: Wait for MySQL
+      run: |
+        for i in {1..10}; do
+          if docker exec db mysqladmin ping -uroot -p${{ secrets.DB_PASSWORD }} --silent; then
+            echo "MySQL is ready!"
+            exit 0
+          fi
+          echo "Waiting for MySQL..."
+          sleep 5
+        done
+        echo "MySQL is not ready in time."
+        exit 1
+
     - name: Check mysql
-      run: docker exec db mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "USE advent_calendar; SELECT 'Database exists!' AS Result;" 
+      run: docker exec db mysql -uroot -p${{ secrets.DB_PASSWORD }} -e "USE advent_calendar; SELECT 'Database exists!' AS Result;"
 
     - name: Test
       run: make test
-    
