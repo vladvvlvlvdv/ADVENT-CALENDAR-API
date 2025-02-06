@@ -50,7 +50,7 @@ func (a *App) Run() {
 	}()
 
 	//mail.ScheduleSendEmailsToUsers()
-
+	log.Println("1")
 	router.LoadRoutes(a.Server.Group("/api"))
 	err := a.Server.Listen(fmt.Sprintf(":%s", config.Config.PORT))
 	if err != nil {
